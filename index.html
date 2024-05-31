@@ -1,173 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Code Editor</title>
-    <link rel="shortcut icon" href="./static/icon.png?ver=240529v1" type="image/x-icon" />    
-    <!-- 로컬에 다운로드한 Skulpt와 Skulpt-stdlib를 로드합니다 -->
-    <script src="./static/skulpt.min.js"></script>
-    <script src="./static/skulpt-stdlib.js"></script>
-    <!-- Codemirror CSS와 JS를 로드합니다 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 90%;
-            max-width: 1500px;
-        }
-        h2 {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .CodeMirror {
-            height: 300px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        button {
-            background-color: #f4de3d;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #f4d85a;
-            font-weight:bold;
-        }
-        #font-size-container {
-            display: flex;
-            align-items: center;
-        }
-        #font-size-container label {
-            margin-right: 5px;
-        }
-        #output-title {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            text-align: left;
-        }
-        #output {
-            background: #f8f8f8;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width:calc(94% - 400px);
-            height: 400px;
-            float:left;
-            overflow-y: auto;
-        }
-        #mycanvas {
-            background: #f8f8f8;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            float:right;
-            width: 400px;  
-            height: 400px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Python Code Editor</h2>
-        <div class="controls">
-           <button id="connect">Connect</button>
-           <br>
-           <input type="text" id="command">
-           <button id="send">Send</button>
-           <br>
-           <span id="result"></span>
+    <link rel="stylesheet" href="./static/index.css?ver=240528v1" />
+    <title>examplepage</title>
+  </head>
+  <body>
+   <button id="connect">Connect</button>
+   <br>
+    <textarea id="python-code" name="code"></textarea>
+   <button id="send">Send</button>
+   <br>
+   <span id="result"></span>
+  </body>
+  <script src="./static/index.js?ver=240528v1"></script>
+</html>
 
-            <button onclick="executePython()">Run</button>
-            <button onclick="executePythonToDev()">Run</button>
-            <div id="font-size-container">
-                <label for="font-size">Font size:</label>
-                <input type="number" id="font-size" value="14" min="10" max="24" step="1" onchange="changeFontSize()">
-            </div>
-        </div>
-        <textarea id="python-code" name="code"></textarea><br>
-        <div id="output-title">Result</div>
-        <div>  
-            <div id="output">
-                <div id="output-content"></div>
-            </div>
-            <div id="mycanvas"></div>
-        </div>
-    </div>
 
-    <script type="text/javascript">
+
+
         // Codemirror 초기화
-
-        const textEncoder = new TextEncoderStream();
-        const textDecoder = new TextDecoderStream();
-        const reader = textDecoder.readable.getReader();
-        const writer = textEncoder.writable.getWriter();
-        const command = document.getElementById('command');
-        const result = document.getElementById('result');
-      
-        document.getElementById('send').addEventListener('click', async () => {
-          await writer.write('#'+command.value+'!');
-        });
-        
-        document.getElementById('connect').addEventListener('click', async () => {
-
-          const port = await navigator.serial.requestPort();      
-          const { productId, vendorId } = port.getInfo();
-          console.log(productId, vendorId);
-      
-          // Wait for the serial port to open.
-          await port.open({ baudRate: 115200 });
-      
-          const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-          const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-      
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-              // 나중에 시리얼 포트가 닫힐 수 있도록 해준다.
-              reader.releaseLock();
-              break;
-            }
-      
-            if (value) {
-              result.innerHTML = value;
-              console.log(value);
-            }
-          }
-        });
-      
-        if ("serial" in navigator) result.innerHTML = "Your browser supports Web Serial API!";
-        else result.innerHTML = "Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!";
-
-      
         var editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
             mode: { name: "python", version: 3, singleLineStringErrors: false },
             lineNumbers: true,
@@ -176,43 +33,53 @@
             theme: "monokai"
         });
 
-        function changeFontSize() {
-            var fontSize = document.getElementById("font-size").value + "px";
-            editor.getWrapperElement().style.fontSize = fontSize;
-            editor.refresh();
-        }
 
-        function executePython() {
-            var code = editor.getValue();
-            document.getElementById("output-content").innerText = "";  // 이전 출력 내용 초기화
+  const textEncoder = new TextEncoderStream();
+  const textDecoder = new TextDecoderStream();
+  const reader = textDecoder.readable.getReader();
+  const writer = textEncoder.writable.getWriter();
+  const command = document.getElementById('command');
+  const result = document.getElementById('result');
 
-            // Sk.configure를 사용하여 Skulpt 초기화
-            Sk.configure({
-                output: function(text) {
-                    // 결과를 출력합니다.
-                    document.getElementById("output-content").innerText += text.replace(/^\n+/, ''); // 공백 제거
-                },
-                read: function(filename) {
-                    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][filename] === undefined) {
-                        throw "File not found: '" + filename + "'";
-                    }
-                    return Sk.builtinFiles["files"][filename];
-                }
-            });
-            (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
-            // Python 코드를 실행합니다.
-            Sk.misceval.asyncToPromise(function() {
-                return Sk.importMainWithBody("<stdin>", false, code, true);
-            }).catch(function(err) {
-                document.getElementById("output-content").innerText = err.toString();
-            });
-        }
+  document.getElementById('send').addEventListener('click', async () => {
+    await writer.write(editor.getValue());
+  });
+  
+  document.getElementById('connect').addEventListener('click', async () => {
 
-        function executePythonToDev() {
-            var code = editor.getValue();
 
-        }
+/*
+     const filters = [
+      { usbVendorId: 0x2341, usbProductId: 0x0043 },
+      { usbVendorId: 0x2341, usbProductId: 0x0001 }
+    ];
+    
+    const port = await navigator.serial.requestPort({ filters });
+*/
+    const port = await navigator.serial.requestPort();      
+    const { productId, vendorId } = port.getInfo();
+    console.log(productId, vendorId);
 
-    </script>
-</body>
-</html>
+    // Wait for the serial port to open.
+    await port.open({ baudRate: 115200 });
+
+    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+    const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        // 나중에 시리얼 포트가 닫힐 수 있도록 해준다.
+        reader.releaseLock();
+        break;
+      }
+
+      if (value) {
+        result.innerHTML = value;
+        console.log(value);
+      }
+    }
+  });
+
+  if ("serial" in navigator) result.innerHTML = "Your browser supports Web Serial API!";
+  else result.innerHTML = "Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!";
