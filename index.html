@@ -11,11 +11,16 @@
   </head>
   <body>
    <button id="connect">Connect</button>
-   <br>
-    <textarea id="python-code" name="code"></textarea>
    <button id="send">Send</button>
-   <br>
-   <span id="result"></span>
+   <div>
+     <div>
+       <textarea id="python-code" name="code"></textarea>
+
+     </div>
+     <div>
+       <div id="output"></span>
+     </div> 
+   </div>   
   </body>
   <script>
 
@@ -44,13 +49,11 @@
   
   document.getElementById('connect').addEventListener('click', async () => {
 
-
 /*
      const filters = [
       { usbVendorId: 0x2341, usbProductId: 0x0043 },
       { usbVendorId: 0x2341, usbProductId: 0x0001 }
     ];
-    
     const port = await navigator.serial.requestPort({ filters });
 */
     const port = await navigator.serial.requestPort();      
@@ -59,10 +62,7 @@
 
     // Wait for the serial port to open.
     await port.open({ baudRate: 115200 });
-
-    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-    const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-
+    
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
@@ -72,18 +72,14 @@
       }
 
       if (value) {
-        result.innerHTML = value;
+        document.getElementById("output").innerText = value;
         console.log(value);
       }
     }
   });
 
-  if ("serial" in navigator) result.innerHTML = "Your browser supports Web Serial API!";
-  else result.innerHTML = "Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!";
-
-
-
-
+  if ("serial" in navigator) alert("Your browser supports Web Serial API!");
+  document.getElementById("output").innerText = alert("Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!");
     
   </script>
 </html>
