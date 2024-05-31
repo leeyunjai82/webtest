@@ -32,13 +32,16 @@
         theme: "monokai"
     });
 
+
+  const textEncoder = new TextEncoderStream();
+  const textDecoder = new TextDecoderStream();
   const reader = textDecoder.readable.getReader();
   const writer = textEncoder.writable.getWriter();
   const command = document.getElementById('command');
   const result = document.getElementById('result');
 
   document.getElementById('send').addEventListener('click', async () => {
-    console.log(editor.getValue());
+    console.log(editor.getValue())
     await writer.write(editor.getValue());
   });
   
@@ -57,7 +60,8 @@
 
     // Wait for the serial port to open.
     await port.open({ baudRate: 115200 });
-    
+    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+    const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
