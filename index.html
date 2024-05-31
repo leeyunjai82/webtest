@@ -13,27 +13,24 @@
    <button id="connect">Connect</button>
    <button id="send">Send</button>
    <div>
-     <div>
+     <div style="float:left;width:45vw">
        <textarea id="python-code" name="code"></textarea>
-
      </div>
-     <div>
+     <div style="float:right;width:45vw">
        <div id="output"></span>
      </div> 
    </div>   
   </body>
   <script>
 
-
-
-        // Codemirror 초기화
-        var editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
-            mode: { name: "python", version: 3, singleLineStringErrors: false },
-            lineNumbers: true,
-            indentUnit: 4,
-            matchBrackets: true,
-            theme: "monokai"
-        });
+    // Codemirror 초기화
+    var editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
+        mode: { name: "python", version: 3, singleLineStringErrors: false },
+        lineNumbers: true,
+        indentUnit: 4,
+        matchBrackets: true,
+        theme: "monokai"
+    });
 
 
   const textEncoder = new TextEncoderStream();
@@ -79,11 +76,10 @@
   });
 
   if ("serial" in navigator) alert("Your browser supports Web Serial API!");
-  document.getElementById("output").innerText = alert("Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!");
+  else document.getElementById("output").innerText = alert("Your browser does not support Web Serial API, the latest version of Google Chrome is recommended!");
     
   </script>
 </html>
-
 
 
 
