@@ -32,15 +32,13 @@
         theme: "monokai"
     });
 
-
-  const textEncoder = new TextEncoderStream();
-  const textDecoder = new TextDecoderStream();
   const reader = textDecoder.readable.getReader();
   const writer = textEncoder.writable.getWriter();
   const command = document.getElementById('command');
   const result = document.getElementById('result');
 
   document.getElementById('send').addEventListener('click', async () => {
+    console.log(editor.getValue());
     await writer.write(editor.getValue());
   });
   
